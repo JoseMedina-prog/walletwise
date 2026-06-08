@@ -1,0 +1,114 @@
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+dist/
+.angular/
+.cache/
+.next/
+.nuxt/
+.parcel-cache/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# =========================
+# PHP / Laravel
+# =========================
+/vendor/
+.phpunit.result.cache
+.phpunit.cache/
+.phpunit.cache.testdox
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+.fleet
+.idea
+.serverless
+public/storage
+public/hot
+public/build
+storage/*.key
+/storage/app/private/
+/storage/app/public/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+/storage/framework/testing/
+/storage/logs/
+/bootstrap/cache/
+.env
+.env.backup
+.env.production
+.env.testing
+.php_cs.cache
+.phpunit.result.cache
+auth.json
+config/database.php
+config/services.php
+config/mail.php
+config/cache.php
+config/queue.php
+config/session.php
+config/view.php
+
+# =========================
+# MySQL / SQLite / DB dumps
+# =========================
+*.sqlite
+*.sqlite-journal
+*.db
+*.sql
+!database/migrations/*.php
+!database/seeders/*.php
+!database/factories/*.php
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# Build artifacts
+# =========================
+*.tgz
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# =========================
+# Tests / Coverage
+# =========================
+/build/
+/docs/
+/tmp/
+.phpunit.cache
+coverage/
+.nyc_output/
+
+# =========================
+# Misc
+# =========================
+*.local
+.env.local
+.env.*.local
+.history
