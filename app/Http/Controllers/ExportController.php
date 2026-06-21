@@ -16,6 +16,7 @@ class ExportController extends Controller
         $to = $request->query('to') ?: '2999-12-31';
         $type = $request->query('type');
         $categoryId = $request->query('category_id');
+        $q = $request->query('q');
 
         $query = Transaction::query()
             ->where('user_id', $userId)
@@ -30,6 +31,10 @@ class ExportController extends Controller
         }
         if ($categoryId && is_numeric($categoryId)) {
             $query->where('category_id', (int) $categoryId);
+        }
+        if (is_string($q) && trim($q) !== '') {
+            $term = '%'.addcslashes(trim($q), '%_\\').'%';
+            $query->where('description', 'LIKE', $term);
         }
 
         $filename = 'walletwise-transactions-'.now()->format('Y-m-d').'.csv';

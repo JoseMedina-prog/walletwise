@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Budget;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -78,10 +79,26 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $budgets = Budget::query()
+            ->where('user_id', $userId)
+            ->where('is_active', true)
+            ->with('category')
+            ->get()
+            ->sortByDesc(fn (Budget $b) => $b->percentUsed())
+            ->take(5)
+            ->map(function (Budget $b) {
+                $b->spent = $b->spentInPeriod();
+                $b->percent = $b->percentUsed();
+                $b->level = $b->alertLevel();
+                return $b;
+            })
+            ->values();
+
         return view('dashboard', compact(
             'totalBalance', 'totalIncome', 'totalExpense',
             'monthIncome', 'monthExpense', 'savingsRate',
-            'monthlyData', 'expensesByCategory', 'recentTransactions'
+            'monthlyData', 'expensesByCategory', 'recentTransactions',
+            'budgets'
         ));
     }
 }

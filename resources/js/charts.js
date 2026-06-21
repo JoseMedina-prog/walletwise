@@ -171,47 +171,12 @@ export function renderCategoryDoughnut(canvas, labels, values) {
     });
 }
 
-/* === Dark mode persistence === */
-const Theme = {
-    STORAGE_KEY: 'ww-theme',
-    init() {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const dark = stored ? stored === 'dark' : prefersDark;
-        this.apply(dark);
-
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!localStorage.getItem(this.STORAGE_KEY)) {
-                this.apply(e.matches);
-            }
-        });
-    },
-    apply(dark) {
-        document.documentElement.classList.toggle('dark', dark);
-        document.dispatchEvent(new CustomEvent('ww:theme-changed', { detail: { dark } }));
-    },
-    toggle() {
-        const next = !document.documentElement.classList.contains('dark');
-        this.apply(next);
-        localStorage.setItem(this.STORAGE_KEY, next ? 'dark' : 'light');
-    },
-    current() {
-        return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-    },
-};
-
-window.WWTheme = Theme;
 window.WWCharts = { renderMonthlyBar, renderCategoryDoughnut, PALETTE };
-
-document.addEventListener('DOMContentLoaded', () => {
-    Theme.init();
-});
 
 // Notify listeners that Chart helpers are ready
 document.dispatchEvent(new CustomEvent('ww:charts-ready'));
 
 /* === Chart redraw on theme change === */
 document.addEventListener('ww:theme-changed', () => {
-    // Charts listen for this and re-instantiate via a custom event
     document.dispatchEvent(new CustomEvent('ww:charts-redraw'));
 });

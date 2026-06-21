@@ -26,4 +26,9 @@ class Category extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function budget(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Budget::class);
+    }
 }

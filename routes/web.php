@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportController;
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('transactions/suggest-category', [TransactionController::class, 'suggestCategory'])->name('transactions.suggest-category');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/exports/transactions.csv', [ExportController::class, 'transactions'])->name('exports.transactions');
+    Route::resource('budgets', BudgetController::class);
 });
 
 /*

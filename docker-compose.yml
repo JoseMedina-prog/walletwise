@@ -1,0 +1,122 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        WWWGROUP: ${WWWGROUP:-1000}
+    container_name: walletwise-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      # Código fuente desde el host (cambios en vivo)
+      - ./:/var/www/html
+      # vendor cacheado en volumen Docker (mucho más rápido que bind-mount)
+      - vendor_cache:/var/www/html/vendor
+      # Storage siempre writable
+      - ./storage:/var/www/html/storage
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: ${APP_URL:-http://localhost:8090}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-walletwise_db}
+      DB_USERNAME: ${DB_USERNAME:-walletwise}
+      DB_PASSWORD: ${DB_PASSWORD:-walletwise_secret}
+      CACHE_STORE: ${CACHE_STORE:-file}
+      SESSION_DRIVER: ${SESSION_DRIVER:-file}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-false}
+      RUN_SEEDERS: ${RUN_SEEDERS:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - walletwise-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  web:
+    image: nginx:1.27-alpine
+    container_name: walletwise-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8090}:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - walletwise-net
+
+  db:
+    image: mysql:8.4
+    container_name: walletwise-db
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
+      MYSQL_DATABASE: ${DB_DATABASE:-walletwise_db}
+      MYSQL_USER: ${DB_USERNAME:-walletwise}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-walletwise_secret}
+    volumes:
+      - db_data:/var/lib/mysql
+    command:
+      - --innodb-buffer-pool-size=256M
+      - --max-connections=200
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_secret}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - walletwise-net
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: walletwise-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning --maxmemory 128mb --maxmemory-policy allkeys-lru
+    networks:
+      - walletwise-net
+
+  node:
+    image: node:20-alpine
+    container_name: walletwise-node
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - node_modules:/var/www/html/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    profiles: ["dev"]
+    networks:
+      - walletwise-net
+
+networks:
+  walletwise-net:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+  vendor_cache:
+    driver: local
+  node_modules:
+    driver: local

@@ -21,12 +21,20 @@
         <x-ui.input id="password" name="password" type="password" label="Nueva contraseña"
                     required autocomplete="new-password"
                     placeholder="Mínimo 8 caracteres"
-                    :error="$errors->first('password')" />
+                    :error="$errors->first('password')" class="[&>div>input]:!pr-10">
+            <x-slot:append>
+                <x-password-toggle target="password" />
+            </x-slot:append>
+        </x-ui.input>
 
         <x-ui.input id="password_confirmation" name="password_confirmation" type="password"
                     label="Confirmar contraseña" required autocomplete="new-password"
                     placeholder="Repite la contraseña"
-                    :error="$errors->first('password_confirmation')" />
+                    :error="$errors->first('password_confirmation')" class="[&>div>input]:!pr-10">
+            <x-slot:append>
+                <x-password-toggle target="password_confirmation" />
+            </x-slot:append>
+        </x-ui.input>
 
         <x-ui.button type="submit" variant="primary" size="lg" class="w-full">
             Restablecer contraseña

@@ -41,6 +41,16 @@
                         <x-icon.category class="w-4 h-4" />
                         {{ __('Categorías') }}
                     </a>
+                    <a href="{{ route('budgets.index') }}"
+                       @class([
+                           'nav-link',
+                           'nav-link-active' => request()->routeIs('budgets.*'),
+                       ])>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M3 16.061V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-1.939M3 16.061c0-1.18.91-2.165 2.087-2.317l9.193-1.456a2.25 2.25 0 012.236 1.272M21 16.061V18a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-1.939"/>
+                        </svg>
+                        {{ __('Presupuestos') }}
+                    </a>
 
                     @auth
                         @if (auth()->user()->isAdmin())
@@ -59,18 +69,7 @@
 
             <div class="hidden sm:flex sm:items-center sm:gap-2">
                 {{-- Theme toggle --}}
-                <button type="button"
-                        @click="window.WWTheme.toggle()"
-                        class="btn-icon"
-                        :aria-label="window.WWTheme?.current() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-                        aria-label="Cambiar tema">
-                    <svg x-show="window.WWTheme?.current() === 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
-                    </svg>
-                    <svg x-show="window.WWTheme?.current() !== 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
-                    </svg>
-                </button>
+                <x-theme-toggle size="sm" />
 
                 {{-- User menu --}}
                 <x-dropdown align="right" width="56">
@@ -117,14 +116,7 @@
             </div>
 
             <div class="-me-2 flex items-center gap-1 sm:hidden">
-                <button type="button" @click="window.WWTheme.toggle()" class="btn-icon" aria-label="Cambiar tema">
-                    <svg x-show="window.WWTheme?.current() === 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
-                    </svg>
-                    <svg x-show="window.WWTheme?.current() !== 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
-                    </svg>
-                </button>
+                <x-theme-toggle size="md" />
                 <button @click="open = ! open" class="btn-icon" :aria-label="open ? 'Cerrar menú' : 'Abrir menú'">
                     <svg x-show="!open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>

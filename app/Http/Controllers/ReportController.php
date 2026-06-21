@@ -18,6 +18,7 @@ class ReportController extends Controller
         $to = $request->query('to') ?: now()->toDateString();
         $type = $request->query('type');
         $categoryId = $request->query('category_id');
+        $q = $request->query('q');
 
         $base = Transaction::query()
             ->where('user_id', $userId)
@@ -29,6 +30,10 @@ class ReportController extends Controller
         }
         if ($categoryId && is_numeric($categoryId)) {
             $base->where('category_id', (int) $categoryId);
+        }
+        if (is_string($q) && trim($q) !== '') {
+            $term = '%'.addcslashes(trim($q), '%_\\').'%';
+            $base->where('description', 'LIKE', $term);
         }
 
         $income = (float) (clone $base)->where('type', 'income')->sum('amount');
@@ -78,7 +83,7 @@ class ReportController extends Controller
             ->get();
 
         return view('reports.index', compact(
-            'from', 'to', 'type', 'categoryId',
+            'from', 'to', 'type', 'categoryId', 'q',
             'income', 'expense', 'balance', 'count',
             'breakdownExpense', 'breakdownIncome',
             'transactions', 'categories'

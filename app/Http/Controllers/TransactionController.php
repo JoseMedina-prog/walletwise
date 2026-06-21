@@ -27,6 +27,7 @@ class TransactionController extends Controller
         $to = $request->query('to');
         $type = $request->query('type');
         $categoryId = $request->query('category_id');
+        $q = $request->query('q');
 
         if ($from) {
             $query->whereDate('transaction_date', '>=', $from);
@@ -41,6 +42,11 @@ class TransactionController extends Controller
             $query->where('category_id', (int) $categoryId);
         }
 
+        if (is_string($q) && trim($q) !== '') {
+            $term = '%'.addcslashes(trim($q), '%_\\').'%';
+            $query->where('description', 'LIKE', $term);
+        }
+
         $transactions = $query->paginate(15)->withQueryString();
         $categories = $this->userCategories($userId);
 
@@ -51,7 +57,7 @@ class TransactionController extends Controller
         $summary['balance'] = $summary['income'] - $summary['expense'];
 
         return view('transactions.index', compact(
-            'transactions', 'categories', 'from', 'to', 'type', 'categoryId', 'summary'
+            'transactions', 'categories', 'from', 'to', 'type', 'categoryId', 'q', 'summary'
         ));
     }
 

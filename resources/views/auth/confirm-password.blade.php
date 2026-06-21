@@ -8,7 +8,11 @@
 
         <x-ui.input id="password" name="password" type="password" label="Contraseña"
                     required autocomplete="current-password" placeholder="••••••••"
-                    :error="$errors->first('password')" />
+                    :error="$errors->first('password')" class="[&>div>input]:!pr-10">
+            <x-slot:append>
+                <x-password-toggle target="password" />
+            </x-slot:append>
+        </x-ui.input>
 
         <x-ui.button type="submit" variant="primary" size="lg" class="w-full">
             Confirmar

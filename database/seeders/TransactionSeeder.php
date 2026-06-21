@@ -24,18 +24,20 @@ class TransactionSeeder extends Seeder
             }
 
             for ($i = 0; $i < 20; $i++) {
-                $isIncome = fake()->boolean(40);
+                $isIncome = mt_rand(1, 100) <= 40;
                 $cat = $isIncome ? $incomeCats->random() : $expenseCats->random();
-                $date = Carbon::now()->subDays(rand(0, 60));
+                $date = Carbon::now()->subDays(mt_rand(0, 60));
 
                 Transaction::create([
                     'user_id' => $user->id,
                     'category_id' => $cat->id,
                     'type' => $isIncome ? 'income' : 'expense',
-                    'amount' => $isIncome ? fake()->randomFloat(2, 500, 4000) : fake()->randomFloat(2, 5, 250),
+                    'amount' => $isIncome
+                        ? round(mt_rand(50000, 400000) / 100, 2)
+                        : round(mt_rand(500, 25000) / 100, 2),
                     'description' => $isIncome
-                        ? fake()->randomElement($incomeDescriptions)
-                        : fake()->randomElement($expenseDescriptions),
+                        ? $incomeDescriptions[array_rand($incomeDescriptions)]
+                        : $expenseDescriptions[array_rand($expenseDescriptions)],
                     'transaction_date' => $date->toDateString(),
                 ]);
             }

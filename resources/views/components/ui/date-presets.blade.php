@@ -14,7 +14,17 @@
     @foreach (DateRange::catalog() as $slug => $label)
         @php
             $range = DateRange::preset($slug);
-            $url = $route . '?from=' . $range['from'] . '&to=' . $range['to'];
+            $query = ['from' => $range['from'], 'to' => $range['to']];
+            if (request()->filled('q')) {
+                $query['q'] = request('q');
+            }
+            if (request()->filled('type')) {
+                $query['type'] = request('type');
+            }
+            if (request()->filled('category_id')) {
+                $query['category_id'] = request('category_id');
+            }
+            $url = $route . '?' . http_build_query($query);
         @endphp
         <a href="{{ $url }}"
            @class([

@@ -30,7 +30,11 @@
             </div>
             <x-ui.input id="password" name="password" type="password" required
                         autocomplete="current-password" placeholder="••••••••"
-                        :error="$errors->first('password')" />
+                        :error="$errors->first('password')" class="[&>div>input]:!pr-10">
+                <x-slot:append>
+                    <x-password-toggle target="password" />
+                </x-slot:append>
+            </x-ui.input>
         </div>
 
         <div class="flex items-center">

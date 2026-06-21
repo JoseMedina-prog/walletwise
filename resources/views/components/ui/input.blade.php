@@ -23,7 +23,7 @@
             </span>
         @endif
 
-        <input {{ $attributes->except(['label', 'error', 'hint', 'prefix', 'suffix', 'class', 'id'])->merge([
+        <input {{ $attributes->except(['label', 'error', 'hint', 'prefix', 'suffix', 'class'])->merge([
             'class' => trim(($prefix ? 'pl-8 ' : '') . 'form-input'),
         ]) }}>
 
@@ -32,6 +32,8 @@
                 {{ $suffix }}
             </span>
         @endif
+
+        {{ $append ?? '' }}
     </div>
 
     @if ($error)

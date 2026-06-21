@@ -29,6 +29,50 @@
                                hint="Del mes actual" icon="report" tone="accent" />
             </div>
 
+            {{-- Budgets widget --}}
+            @if (!empty($budgets))
+                <x-ui.card padding="p-0" class="overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-accent-50 dark:bg-accent-950/40 flex items-center justify-center text-accent-600 dark:text-accent-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M3 16.061V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-1.939M3 16.061c0-1.18.91-2.165 2.087-2.317l9.193-1.456a2.25 2.25 0 012.236 1.272M21 16.061V18a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-1.939"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="section-title">Presupuestos del mes</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ now()->translatedFormat('F Y') }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('budgets.index') }}" class="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition">
+                            Gestionar
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                        </a>
+                    </div>
+                    <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @foreach ($budgets as $budget)
+                            <div class="px-6 py-4">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="font-semibold text-slate-900 dark:text-slate-100 truncate flex-1 min-w-0">
+                                        {{ $budget->category->name }}
+                                    </h4>
+                                    @if ($budget->level === 'over')
+                                        <span class="badge-expense">Excedido</span>
+                                    @elseif ($budget->level === 'warn')
+                                        <span class="badge-accent">Alerta</span>
+                                    @endif
+                                </div>
+                                <x-ui.budget-progress
+                                    :percent="$budget->percent"
+                                    :level="$budget->level"
+                                    :spent="$budget->spent"
+                                    :monthly="$budget->monthly_amount" />
+                            </div>
+                        @endforeach
+                    </div>
+                </x-ui.card>
+            @endif
+
             {{-- Charts --}}
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 <x-ui.card padding="p-6" class="lg:col-span-3">
