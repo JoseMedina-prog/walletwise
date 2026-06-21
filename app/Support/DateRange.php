@@ -91,4 +91,25 @@ class DateRange
 
         return null; // rango personalizado
     }
+
+    /**
+     * Devuelve el rango inmediatamente anterior de la misma duración que [$from, $to].
+     * Útil para comparar periodos: si el actual es "1-31 mayo", devuelve "1-30 abril".
+     *
+     * @return array{from: string, to: string}
+     */
+    public static function previousOf(string $from, string $to): array
+    {
+        $start = Carbon::parse($from);
+        $end   = Carbon::parse($to);
+        $durationDays = (int) $start->diffInDays($end) + 1;
+
+        $prevEnd   = $start->copy()->subDay();
+        $prevStart = $prevEnd->copy()->subDays($durationDays - 1);
+
+        return [
+            'from' => $prevStart->toDateString(),
+            'to'   => $prevEnd->toDateString(),
+        ];
+    }
 }

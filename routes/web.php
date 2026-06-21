@@ -6,7 +6,11 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\GoalContributionController;
+use App\Http\Controllers\GoalController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecurringTransactionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +35,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/exports/transactions.csv', [ExportController::class, 'transactions'])->name('exports.transactions');
     Route::resource('budgets', BudgetController::class);
+    Route::resource('recurring', RecurringTransactionController::class)->parameters(['recurring' => 'recurring']);
+    Route::post('recurring/{recurring}/post', [RecurringTransactionController::class, 'post'])->name('recurring.post');
+
+    Route::resource('goals', GoalController::class);
+    Route::post('goals/{goal}/contributions', [GoalContributionController::class, 'store'])->name('goals.contributions.store');
+    Route::delete('goals/{goal}/contributions/{contribution}', [GoalContributionController::class, 'destroy'])->name('goals.contributions.destroy');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
 });
 
 /*

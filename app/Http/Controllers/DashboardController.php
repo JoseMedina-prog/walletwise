@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Budget;
+use App\Models\Goal;
+use App\Models\RecurringTransaction;
 use App\Models\Transaction;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -32,9 +35,31 @@ class DashboardController extends Controller
             ->whereMonth('transaction_date', $now->month)
             ->sum('amount');
 
+        $prevMonth = $now->copy()->subMonthNoOverflow();
+
+        $prevMonthIncome = (float) Transaction::where('user_id', $userId)
+            ->where('type', 'income')
+            ->whereYear('transaction_date', $prevMonth->year)
+            ->whereMonth('transaction_date', $prevMonth->month)
+            ->sum('amount');
+
+        $prevMonthExpense = (float) Transaction::where('user_id', $userId)
+            ->where('type', 'expense')
+            ->whereYear('transaction_date', $prevMonth->year)
+            ->whereMonth('transaction_date', $prevMonth->month)
+            ->sum('amount');
+
         $savingsRate = $monthIncome > 0
             ? round((($monthIncome - $monthExpense) / $monthIncome) * 100, 1)
             : 0.0;
+
+        $incomeTrend    = self::delta($monthIncome, $prevMonthIncome, inverse: false);
+        $expenseTrend   = self::delta($monthExpense, $prevMonthExpense, inverse: true);
+        $savingsTrend   = self::delta(
+            $monthIncome > 0 ? ($monthIncome - $monthExpense) / max($monthIncome, 1) * 100 : 0,
+            $prevMonthIncome > 0 ? ($prevMonthIncome - $prevMonthExpense) / max($prevMonthIncome, 1) * 100 : 0,
+            inverse: false
+        );
 
         $monthlyData = [];
         for ($i = 5; $i >= 0; $i--) {
@@ -94,11 +119,66 @@ class DashboardController extends Controller
             })
             ->values();
 
+        $dueRecurrings = RecurringTransaction::query()
+            ->where('user_id', $userId)
+            ->where('is_active', true)
+            ->where('next_occurrence', '<=', CarbonImmutable::now()->toDateString())
+            ->where(function ($q) {
+                $q->whereNull('end_date')
+                  ->orWhere('end_date', '>=', CarbonImmutable::now()->toDateString());
+            })
+            ->with('category')
+            ->orderBy('next_occurrence')
+            ->limit(5)
+            ->get()
+            ->map(fn (RecurringTransaction $r) => tap($r, fn ($r) => $r->label = $r->frequencyLabel()));
+
+        $activeGoals = Goal::query()
+            ->where('user_id', $userId)
+            ->where('is_completed', false)
+            ->orderByDesc('created_at')
+            ->limit(3)
+            ->get()
+            ->each(function (Goal $g) {
+                $g->percent = $g->percentReached();
+                $g->monthly_suggestion = $g->suggestedMonthlyContribution();
+            });
+
         return view('dashboard', compact(
             'totalBalance', 'totalIncome', 'totalExpense',
             'monthIncome', 'monthExpense', 'savingsRate',
+            'prevMonthIncome', 'prevMonthExpense',
+            'incomeTrend', 'expenseTrend', 'savingsTrend',
             'monthlyData', 'expensesByCategory', 'recentTransactions',
-            'budgets'
+            'budgets', 'dueRecurrings', 'activeGoals'
         ));
+    }
+
+    /**
+     * Calcula delta porcentual entre valor actual y previo.
+     *
+     * @return array{label: string|null, tone: string}|null
+     */
+    private static function delta(float $current, float $previous, bool $inverse): ?array
+    {
+        if ($previous == 0.0 && $current == 0.0) {
+            return ['label' => '0%', 'tone' => 'neutral'];
+        }
+        if ($previous == 0.0) {
+            return ['label' => 'Nuevo', 'tone' => $inverse ? 'expense' : 'income'];
+        }
+
+        $pct = round((($current - $previous) / abs($previous)) * 100, 1);
+        if ($pct == 0.0) {
+            return ['label' => '0%', 'tone' => 'neutral'];
+        }
+
+        $isUp = $pct > 0;
+        $good = $inverse ? !$isUp : $isUp;
+
+        return [
+            'label' => ($isUp ? '+' : '') . number_format($pct, 1) . '%',
+            'tone'  => $good ? 'income' : 'expense',
+        ];
     }
 }

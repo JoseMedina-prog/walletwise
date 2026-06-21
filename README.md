@@ -273,31 +273,65 @@ Usa [Laravel Pint](https://laravel.com/docs/pint) (basado en PHP-CS-Fixer) con l
 
 ---
 
-## Ideas para mejoras futuras
+## Roadmap
 
-Esto es un MVP. Hay mucho por construir encima:
+### ✅ Implementado en oleadas anteriores
 
-- [ ] **Presupuestos mensuales** por categoría con alertas cuando se acerque al límite
-- [ ] **Metas de ahorro** con seguimiento de progreso
-- [ ] **Importación CSV** (no solo exportación)
-- [ ] **Multi-moneda** con tasas de cambio
-- [ ] **API REST** con Laravel Sanctum para app móvil
-- [ ] **Autenticación de dos factores** (Laravel Fortify)
-- [ ] **Roles y permisos** (Spatie Laravel-Permission)
-- [ ] **Modo invitado / demo** sin necesidad de registro
-- [ ] **Notificaciones por email** de resúmenes mensuales
-- [ ] **PWA** con service worker para uso offline
-- [ ] **Tests Feature completos** para CategoryController, TransactionController, ReportController y ExportController
-- [ ] **Internacionalización** (i18n) — actualmente UI hardcodeada en español
-- [ ] **Filtros guardados** por usuario
-- [ ] **Adjuntar comprobantes** (imágenes o PDFs) a transacciones
-- [ ] **Categorización automática** con reglas (regex sobre descripción)
-- [ ] **Suscripciones recurrentes** que se generen automáticamente
-- [ ] **Exportación a PDF** de reportes (DomPDF)
-- [ ] **Gráfico de tendencia** del balance acumulado en el tiempo
-- [ ] **Comparación entre meses** (este mes vs mes anterior)
-- [ ] **Docker** para facilitar el setup local
-- [ ] **CI/CD** con GitHub Actions
+Funcionalidades ya disponibles en esta versión:
+
+**Gestión y operación**
+- [x] **Docker + docker-compose** para setup local con PHP 8.3, Nginx, MySQL 8.4, Redis
+- [x] **Búsqueda full-text** por descripción en transacciones (preserva filtros de fecha/tipo/categoría)
+- [x] **Presupuestos mensuales** por categoría con alertas (umbral `warn`/`over`) y widget en dashboard
+- [x] **Notificaciones in-app** (campana con badge) disparadas por presupuestos excedidos, con deduplicación por mes
+- [x] **Suscripciones recurrentes** (sueldos, alquileres, suscripciones) con posting manual y cálculo de próxima fecha
+- [x] **Metas de ahorro** con seguimiento de progreso, aporte mensual sugerido, proyección y estado on-track
+- [x] **Comparación mes a mes** en KPIs del dashboard (delta % vs mes anterior)
+- [x] **Tests Feature completos** para Transactions, Reports, Budgets, Goals, Recurrings, Notifications y Profile (153 tests, 366 assertions)
+
+**Operaciones internas**
+- [x] **CI** con GitHub Actions
+- [x] **Privacy-first** del admin: nunca accede a datos financieros de usuarios
+
+### 🔴 Pendiente — siguiente oleada (alta prioridad)
+
+Funcionalidades con buena relación valor/esfuerzo. Cada una abre una categoría de features para una futura oleada 3:
+
+- [ ] **Importación CSV** — camino inverso al export con preview y mapeo de categorías
+- [ ] **Adjuntar comprobantes** (imágenes/PDF) a transacciones con storage privado y autorización por Policy
+- [ ] **Tags / etiquetas** — segunda dimensión de clasificación complementaria a categoría
+- [ ] **Heatmap calendario** mensual de gastos (engagement visual, retención diaria)
+- [ ] **Auditoría / activity log** de cambios en transacciones, presupuestos y categorías (confianza + debugging)
+- [ ] **Exportación a PDF** del reporte mensual (DomPDF o HTML imprimible)
+- [ ] **Notificaciones por email** de resúmenes semanales y alertas de presupuesto
+
+### 🟡 Diferenciadores de producto (media prioridad)
+
+- [ ] **Multi-cuenta / wallets** (efectivo, banco, tarjeta) con transferencias internas
+- [ ] **Reglas de categorización automática** (regex sobre descripción) por usuario
+- [ ] **Dashboard comparativo** con períodos arbitrarios (no solo mes a mes)
+- [ ] **Filtros guardados** por usuario con nombre y combinación rápida
+- [ ] **Cron automático para recurrentes** (`walletwise:recurring:post` + `Schedule::daily()`)
+- [ ] **Gráfico de tendencia** del balance acumulado en el tiempo (línea, no barras)
+
+### 🟢 Features avanzadas (largo plazo)
+
+Requieren dependencias externas, decisiones de arquitectura o trabajo adicional significativo:
+
+- [ ] **API REST + Sanctum** para app móvil nativa o integraciones de terceros
+- [ ] **Open Banking** (Plaid US/CA, TrueLayer EU, Belvo LATAM) para importar transacciones automáticamente
+- [ ] **Multi-moneda** con tasas de cambio y conversión en tiempo real
+- [ ] **OCR de tickets** (Google Vision / AWS Textract / Veryfi) con extracción de comercio, importe y fecha
+- [ ] **Coach financiero con IA** ("gastaste 23% más en restaurantes este mes") con OpenAI/Anthropic o heurísticas locales
+- [ ] **PWA offline** con Service Worker + IndexedDB para registrar gastos sin conexión
+
+### 🛠️ Calidad y DX
+
+- [ ] **Internacionalización (i18n)** — mover strings hardcoded a `lang/es.json` y soporte multi-idioma
+- [ ] **Autenticación de dos factores** (Laravel Fortify + Google2FA)
+- [ ] **Roles y permisos granulares** (Spatie Laravel-Permission) si el proyecto sale del MVP de admin único
+- [ ] **Modo invitado / demo** sin necesidad de registro (landing con datos de muestra)
+- [ ] **Pint + PHPStan** integrados en CI con umbrales de calidad
 
 ---
 
